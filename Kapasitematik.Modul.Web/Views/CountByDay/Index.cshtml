@@ -1,0 +1,302 @@
+﻿@using GridMvc.Html
+@model IEnumerable<Kapasitematik.Modul.Web.Models.IndexViewModel>
+@{
+    ViewBag.Title = "Index";
+}
+<link href="~/Content/toastr.css" rel="stylesheet" />
+<link href="~/Content/Gridmvc.css" rel="stylesheet" />
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" rel="stylesheet" />
+<style>
+    .panel-title>a {
+  display: block;
+  position: relative;
+}
+
+.panel-title>a:after {
+  content: "\f078";
+  /* fa-chevron-down */
+  font-family: 'FontAwesome';
+  position: absolute;
+  right: 0;
+}
+
+.panel-title>a[aria-expanded="true"]:after {
+  content: "\f077";
+  /* fa-chevron-up */
+}
+
+</style>
+<form class="form-inline" id="form1">
+    <div class="form-group mx-sm-3 mb-2" id="div2">
+        <label for="txtName" class="sr-only">Piece Name</label>
+        <input type="text" class="form-control" name="pieceName" id="txtName" placeholder="Parça Adı">
+    </div>
+    <div class="form-group mx-sm-3 mb-2" id="div3">
+        <label for="txtCount" class="sr-only">Piece Of Count</label>
+        <input type="number" class="form-control" name="pieceOfCount" id="txtCount" placeholder="Girilen Sayı">
+    </div>
+    <div class="form-group mx-sm-3 mb-2" id="div3">
+        <label for="txtTotalCount" class="sr-only">Piece Of Count</label>
+        <input type="number" class="form-control" name="totalCount" id="txtTotalCount" placeholder="Toplam Sayı">
+    </div>
+    <button id="savebtn" type="button" class="btn btn-primary mb-2" onclick="Kaydet()">Kaydet</button>
+    <button id="addbtn" type="button" class="btn btn-primary mb-2">+</button>
+</form>
+<br />
+@Html.Grid(Model).Named("Grid").Columns(column =>
+{
+    column.Add(m => m.Name).Titled("Parça Adı").Sortable(true).Filterable(true);
+    column.Add(m => m.TodayDate).Titled("İşlem Tarihi").Format("{0:d}").Sortable(true).Filterable(true);
+    column.Add(m => m.Count).Titled("Girilen Sayı").Sortable(true).Filterable(true);
+    column.Add(m => m.TotalCount).Titled("Toplam Sayı").Sortable(true).Filterable(true);
+
+    column.Add().Encoded(false).Sanitized(false)
+    .Titled("Detayı Gör").Filterable(false).RenderValueAs(o => new HtmlString("<div id='accordion' role='tablist' aria-multiselectable='true'>" +
+    "<div>" +
+        "<div role='tab' id='heading-2'>" +
+            "<h4 class='panel-title'>" +
+                "<a onclick='list()' data-id='"+ o.Id +"' class='collapsed' role='button' data-toggle='collapse' data-parent='#accordion' href='#collapse-2' aria-expanded='false' aria-controls='collapse-2'>" +
+                "</a>" +
+            "</h4>" +
+        "</div>" +
+        "<div id='collapse-2' class='panel-collapse collapse' role='tabpanel' aria-labelledby='heading-2'>" +
+            "<div class='panel-body'>" +
+             "<div id='divprogress'>" +
+             "</div>" +
+
+            "</div>" +
+             "<div id='chartdiv' style='width:200px; height:200px;'>" +
+             "</div>" +
+        "</div>" +
+
+    "</div>" +
+ "</div>"));
+})
+
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/gridmvc.js"></script>
+<script src="~/Scripts/toastr.min.js"></script>
+
+<script src="//www.amcharts.com/lib/4/core.js"></script>
+<script src="//www.amcharts.com/lib/4/charts.js"></script>
+<script src="//www.amcharts.com/lib/4/themes/animated.js"></script>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('[data-toggle="popover"]').popover();
+
+    })
+    //companyList();  //böyle yapınca sayfa ilk yüklendiğinde çalışsın diyoruz.
+
+    var i = 1;
+    $("#addbtn").click(function (e) {
+        e.preventDefault();
+        i++;
+        $("#div1").append('<div><label for="txtName" class="sr-only">Piece Name</label>' +
+            '<br /><input id="row' + i + '" type="text" class="form-control" name="pieceName" id="txtName" placeholder=""></div>');
+        $("#div2").append('<div><label for="txtCount" class="sr-only">Piece Of Count</label>' +
+            '<br /><input id="row' + i + '" type="number" class="form-control" name="pieceOfCount" id="txtCount" placeholder=""></div>');
+        //$("#btnGroup").append('<button id="addbtn" type="button" class="btn btn-primary mb-2">+</button>');
+        //$("#btnGroup").append('<button id="savebtn" type="button" class="btn btn-primary mb-2" onclick="Kaydet()">Kaydet</button>');
+        //$("form1#savebtn").append('<button id="savebtn" type="button" class="btn btn-primary mb-2" onclick="Kaydet()">Kaydet</button>');
+        //$("form1#addbtn").append('<button id="addbtn" type="button" class="btn btn-primary mb-2">+</button>');
+    })
+
+    function list() {
+        var id = $("#heading-2 a").data("id");
+        var html = "";
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: "/CountByDay/DayList/" + id,
+            data: "",
+            dataType: "json",
+             success: function (data) {
+                 if (data.Result.length > 0) {
+                     $(data.Result).each(function (index, value) {
+
+                         var countValue = document.getElementById("txtCount").value;
+                         var deger = (value.Count / countValue) * 100;
+
+                                    html +=
+                                         '<div class="progress">'
+                                    + barOlustur(deger, value) +
+                             '</div>';
+
+                         $("#divprogress").html(html);
+                         $("#txtName").empty("");
+                         $("#txtCount").empty("");
+                         $("#txtTotalCount").empty("");
+                     });
+
+                 }
+
+                 else {
+                     toastr.info('Kayıt Bulunamadı', '');
+                     $("#divprogress").empty("");
+                 }
+            },
+             error: function (xhr, err) {
+                 toastr.error(xhr.responseText, '');
+            }
+        })
+    }
+    
+    function barOlustur(deger, value) {
+        var htm = "";
+        var newprogress = (parseFloat(value.Count) / 3).toFixed(0);
+        var name = value.Name;
+        var count = value.Count;
+        //var id = value.Id;
+        //console.log(id);
+
+        var totalTime = value.TotalCount; //toplam değer
+        var currentTime = 20; //bugün girilen değer
+        var theDayBeforeTime = 40; //dün girilen değer
+        var timeRemaining = currentTime + theDayBeforeTime; //dün ile bugün girilen değerler toplamı
+        var daysLeft = totalTime - timeRemaining; //kalan gün sayısı
+
+        //var progress = '<div id="progress-bar" onclick="chartOlustur()" class="progress-bar progress-bar-success" data-toggle="popover" data-placement="bottom" data-trigger="hover" title="' + name + '  %' + count + '" data-content="Bitmesine ' + daysLeft + ' Gün Kaldı." role="progressbar" style="width: ' + newprogress + '%" aria-valuenow="' + newprogress + '" aria-valuemin="0" aria-valuemax="' + totalTime + '"> ' + value.Name + '  ' + newprogress + ' %</div>';
+
+
+        if (count < 24) {
+            htm = '<div id="progress-bar1" onclick="' + chartOlustur(value) + '" class="progress-bar progress-bar-success" data-toggle="popover" data-placement="bottom" data-trigger="hover" title="' + name + '  %' + count + '" data-content="Bitmesine ' + daysLeft + ' Gün Kaldı." role="progressbar" style="width: ' + newprogress + '%" aria-valuenow="' + newprogress + '" aria-valuemin="0" aria-valuemax="' + totalTime + '"> ' + value.Name + '  ' + newprogress + ' %</div>';   /*value2.ProgressContent + value2.Name + $('.progress-bar progress-bar-success tool_tip').width(newprogress + "%").attr('aria-valuenow', newprogress);*/
+
+        }
+        else if (count > 25 && count < 50) {
+            htm = '<div id="progress-bar2" onclick="' + chartOlustur(value) + '" class="progress-bar progress-bar-success" data-toggle="popover" data-placement="bottom" data-trigger="hover" title="' + name + '  %' + count + '" data-content="Bitmesine ' + daysLeft + ' Gün Kaldı." role="progressbar" style="width: ' + newprogress + '%" aria-valuenow="' + newprogress + '" aria-valuemin="0" aria-valuemax="' + totalTime + '"> ' + value.Name + '  ' + newprogress + ' %</div>';   /*value2.ProgressContent + value2.Name + $('.progress-bar progress-bar-success tool_tip').width(newprogress + "%").attr('aria-valuenow', newprogress);*/
+
+             $("#progress-bar2").removeClass("progress-bar-success").addClass("progress-bar-info");
+        }
+        else {
+            htm = '<div id="progress-bar3" onclick="' + chartOlustur(value) + '" class="progress-bar progress-bar-success" data-toggle="popover" data-placement="bottom" data-trigger="hover" title="' + name + '  %' + count + '" data-content="Bitmesine ' + daysLeft + ' Gün Kaldı." role="progressbar" style="width: ' + newprogress + '%" aria-valuenow="' + newprogress + '" aria-valuemin="0" aria-valuemax="' + totalTime + '"> ' + value.Name + '  ' + newprogress + ' %</div>';  /*value2.ProgressContent + value2.Name + $('.progress-bar progress-bar-success tool_tip').width(newprogress + "%").attr('aria-valuenow', newprogress);*/
+
+            $("#progress-bar3").removeClass("progress-bar-success").addClass("progress-bar-danger");
+        }
+        return htm;
+    }
+
+    function Kaydet() {
+
+        var p = {
+            "pieceName": $("#txtName").val(),
+            "pieceOfCount": $("#txtCount").val(),
+            "totalCount": $("#txtTotalCount").val()
+        }
+
+        if (p.pieceName == "" || p.pieceName == null) {
+            return  toastr.error('Name alanı boş geçilemez', '');
+        }
+
+         if (p.pieceOfCount == "" || p.pieceOfCount == null) {
+            return  toastr.error('Count alanı boş geçilemez', '');
+        }
+        if (p.totalCount == "" || p.totalCount == null) {
+            return  toastr.error('Total Count alanı boş geçilemez', '');
+        }
+         $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: "@(Url.Action("Save", "CountByDay"))",
+            data: JSON.stringify(p),
+            dataType: "json",
+            success: function (response) {
+                 if (response > 0) {
+                     toastr.success('Kayıt Başarılı', '');
+                     url: "@(Url.Action("DayList", "CountByDay"))"
+                     //$("Grid").reload();
+                 }
+                 else {
+                     toastr.error('Hata oluştu', '');
+                 }
+            },
+             error: function (xhr, err) {
+                 toastr.error(xhr.responseText, '');
+            }
+         })
+
+    }
+
+    function chartOlustur(value) {
+        var id = value.Id;
+        $("#chartdiv").empty();
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: "/CountByDay/ChartOlustur/" + id,
+            data: name,
+            dataType: "json",
+            success: function (data) {
+                var d = data.Result;
+                if (d.length > 0) {
+                    $(d).each(function (index, value) {
+
+                        am4core.useTheme(am4themes_animated);
+
+                        // Create chart instance
+                        var chart = am4core.create("chartdiv", am4charts.XYChart);
+
+                        //Add data
+                        chart.data = $(d).each(function (value) {
+                            [{
+                                "TodayDate": value.TodayDate,
+                                "Count": value.Count
+                            }];
+
+                        });
+
+
+
+                        // Create axes
+                        var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+                        categoryAxis.dataFields.category = "TodayDate";
+                        categoryAxis.renderer.grid.template.location = 0;
+                        //categoryAxis.renderer.minGridDistance = 30;
+
+                        categoryAxis.renderer.labels.template.events.on("over", function(ev) {
+                          var point = categoryAxis.categoryToPoint(ev.target.dataItem.category);
+                          chart.cursor.triggerMove(point, "soft");
+                        });
+
+                        categoryAxis.renderer.labels.template.events.on("out", function(ev) {
+                          var point = categoryAxis.categoryToPoint(ev.target.dataItem.category);
+                          chart.cursor.triggerMove(point, "none");
+                        });
+
+                        var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                        valueAxis.tooltip.disabled = true;
+
+                        // Create series
+                        var series = chart.series.push(new am4charts.ColumnSeries());
+                        series.dataFields.valueY = "Count";
+                        series.dataFields.categoryX = "TodayDate";
+                        series.dataFields.categoryY = "Name";
+                        series.tooltipText = "{categoryX}: {categoryY}: {valueY}";
+
+                        chart.cursor = new am4charts.XYCursor();
+                        chart.cursor.lineY.disabled = true;
+                        chart.cursor.lineX.disabled = true;
+                    })
+                }
+                else {
+                    toastr.info('Kayıt Bulunamadı', '');
+                    $("#divprogress").empty("");
+                }
+            },
+            error: function (xhr, err) {
+                toastr.error(xhr.responseText, '');
+            }
+        })
+    }
+
+</script>
+
+
+
+

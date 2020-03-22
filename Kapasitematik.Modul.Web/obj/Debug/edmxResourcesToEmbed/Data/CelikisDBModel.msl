@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="CelikisDBModelStoreContainer" CdmEntityContainer="CelikisDBEntities">
+    <EntitySetMapping Name="Company">
+      <EntityTypeMapping TypeName="CelikisDBModel.Company">
+        <MappingFragment StoreEntitySet="Company">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
+          <ScalarProperty Name="DeviceNo" ColumnName="DeviceNo" />
+          <ScalarProperty Name="PieceOfCount" ColumnName="PieceOfCount" />
+          <ScalarProperty Name="Cuttting_TM" ColumnName="Cuttting_TM" />
+          <ScalarProperty Name="Program_No" ColumnName="Program_No" />
+          <ScalarProperty Name="Set_No" ColumnName="Set_No" />
+          <ScalarProperty Name="DeviceName" ColumnName="DeviceName" />
+          <ScalarProperty Name="DeviceGroup" ColumnName="DeviceGroup" />
+          <ScalarProperty Name="ProgramNoDetail" ColumnName="ProgramNoDetail" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

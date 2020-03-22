@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="TestDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="CountDay">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SummaryId" Type="int" />
+    <Property Name="TodayDate" Type="date" />
+    <Property Name="Name" Type="nvarchar(max)" />
+    <Property Name="Count" Type="int" />
+    <Property Name="TotalCount" Type="int" />
+  </EntityType>
+  <EntityType Name="Summary">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" />
+    <Property Name="TotalCount" Type="int" />
+  </EntityType>
+  <Association Name="FK_CountDay_Summary">
+    <End Role="Summary" Type="Self.Summary" Multiplicity="0..1" />
+    <End Role="CountDay" Type="Self.CountDay" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Summary">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="CountDay">
+        <PropertyRef Name="SummaryId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="TestDBModelStoreContainer">
+    <EntitySet Name="CountDay" EntityType="Self.CountDay" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Summary" EntityType="Self.Summary" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_CountDay_Summary" Association="Self.FK_CountDay_Summary">
+      <End Role="Summary" EntitySet="Summary" />
+      <End Role="CountDay" EntitySet="CountDay" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

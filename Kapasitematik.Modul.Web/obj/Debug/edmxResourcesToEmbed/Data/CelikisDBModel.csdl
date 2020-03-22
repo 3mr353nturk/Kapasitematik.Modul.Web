@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="CelikisDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Company">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="CompanyName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="DeviceNo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="PieceOfCount" Type="Int32" />
+    <Property Name="Cuttting_TM" Type="DateTime" Precision="3" />
+    <Property Name="Program_No" Type="Int32" />
+    <Property Name="Set_No" Type="Int32" />
+    <Property Name="DeviceName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="DeviceGroup" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="ProgramNoDetail" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityContainer Name="CelikisDBEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Company" EntityType="Self.Company" />
+  </EntityContainer>
+</Schema>

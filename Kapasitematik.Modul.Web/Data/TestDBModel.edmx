@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="TestDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="CountDay">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SummaryId" Type="int" />
+          <Property Name="TodayDate" Type="date" />
+          <Property Name="Name" Type="nvarchar(max)" />
+          <Property Name="Count" Type="int" />
+          <Property Name="TotalCount" Type="int" />
+        </EntityType>
+        <EntityType Name="Summary">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" />
+          <Property Name="TotalCount" Type="int" />
+        </EntityType>
+        <Association Name="FK_CountDay_Summary">
+          <End Role="Summary" Type="Self.Summary" Multiplicity="0..1" />
+          <End Role="CountDay" Type="Self.CountDay" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Summary">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="CountDay">
+              <PropertyRef Name="SummaryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="TestDBModelStoreContainer">
+          <EntitySet Name="CountDay" EntityType="Self.CountDay" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Summary" EntityType="Self.Summary" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_CountDay_Summary" Association="Self.FK_CountDay_Summary">
+            <End Role="Summary" EntitySet="Summary" />
+            <End Role="CountDay" EntitySet="CountDay" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="TestDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="TestDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="CountDay" EntityType="TestDBModel.CountDay" />
+          <EntitySet Name="Summary" EntityType="TestDBModel.Summary" />
+          <AssociationSet Name="FK_CountDay_Summary" Association="TestDBModel.FK_CountDay_Summary">
+            <End Role="Summary" EntitySet="Summary" />
+            <End Role="CountDay" EntitySet="CountDay" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="CountDay">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SummaryId" Type="Int32" />
+          <Property Name="TodayDate" Type="DateTime" Precision="0" />
+          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Count" Type="Int32" />
+          <Property Name="TotalCount" Type="Int32" />
+          <NavigationProperty Name="Summary" Relationship="TestDBModel.FK_CountDay_Summary" FromRole="CountDay" ToRole="Summary" />
+        </EntityType>
+        <EntityType Name="Summary">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="TotalCount" Type="Int32" />
+          <NavigationProperty Name="CountDay" Relationship="TestDBModel.FK_CountDay_Summary" FromRole="Summary" ToRole="CountDay" />
+        </EntityType>
+        <Association Name="FK_CountDay_Summary">
+          <End Type="TestDBModel.Summary" Role="Summary" Multiplicity="0..1" />
+          <End Type="TestDBModel.CountDay" Role="CountDay" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Summary">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="CountDay">
+              <PropertyRef Name="SummaryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="TestDBModelStoreContainer" CdmEntityContainer="TestDBEntities">
+          <EntitySetMapping Name="CountDay">
+            <EntityTypeMapping TypeName="TestDBModel.CountDay">
+              <MappingFragment StoreEntitySet="CountDay">
+                <ScalarProperty Name="TotalCount" ColumnName="TotalCount" />
+                <ScalarProperty Name="Count" ColumnName="Count" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="TodayDate" ColumnName="TodayDate" />
+                <ScalarProperty Name="SummaryId" ColumnName="SummaryId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Summary">
+            <EntityTypeMapping TypeName="TestDBModel.Summary">
+              <MappingFragment StoreEntitySet="Summary">
+                <ScalarProperty Name="TotalCount" ColumnName="TotalCount" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

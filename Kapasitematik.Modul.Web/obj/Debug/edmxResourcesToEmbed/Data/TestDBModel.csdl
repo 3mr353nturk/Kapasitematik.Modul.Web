@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="TestDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="TestDBEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="CountDay" EntityType="TestDBModel.CountDay" />
+    <EntitySet Name="Summary" EntityType="TestDBModel.Summary" />
+    <AssociationSet Name="FK_CountDay_Summary" Association="TestDBModel.FK_CountDay_Summary">
+      <End Role="Summary" EntitySet="Summary" />
+      <End Role="CountDay" EntitySet="CountDay" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="CountDay">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="SummaryId" Type="Int32" />
+    <Property Name="TodayDate" Type="DateTime" Precision="0" />
+    <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="Count" Type="Int32" />
+    <Property Name="TotalCount" Type="Int32" />
+    <NavigationProperty Name="Summary" Relationship="TestDBModel.FK_CountDay_Summary" FromRole="CountDay" ToRole="Summary" />
+  </EntityType>
+  <EntityType Name="Summary">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="TotalCount" Type="Int32" />
+    <NavigationProperty Name="CountDay" Relationship="TestDBModel.FK_CountDay_Summary" FromRole="Summary" ToRole="CountDay" />
+  </EntityType>
+  <Association Name="FK_CountDay_Summary">
+    <End Type="TestDBModel.Summary" Role="Summary" Multiplicity="0..1" />
+    <End Type="TestDBModel.CountDay" Role="CountDay" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Summary">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="CountDay">
+        <PropertyRef Name="SummaryId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>
